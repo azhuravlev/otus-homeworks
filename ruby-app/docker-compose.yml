@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  otus_hw_ruby_app:
+    build: .
+    image: az-otus-homework-ruby
+    ports:
+      - 8000:8000

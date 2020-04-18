@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+set -e
+bundle exec puma -C config/puma.rb
