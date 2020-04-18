@@ -1,0 +1,60 @@
+# github.com/VictoriaMetrics/fastcache v1.4.5
+github.com/VictoriaMetrics/fastcache
+# github.com/apex/log v1.1.0
+github.com/apex/log
+github.com/apex/log/handlers/cli
+# github.com/cespare/xxhash v1.1.0
+github.com/cespare/xxhash
+# github.com/cloudfoundry/gosigar v1.1.0
+github.com/cloudfoundry/gosigar
+github.com/cloudfoundry/gosigar/sys/windows
+# github.com/fatih/color v1.7.0
+github.com/fatih/color
+# github.com/gocarina/gocsv v0.0.0-20190129143436-91f6fc13d488
+github.com/gocarina/gocsv
+# github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
+github.com/golang/snappy
+# github.com/google/uuid v1.0.0
+github.com/google/uuid
+# github.com/gramework/gramework v1.7.0
+github.com/gramework/gramework
+github.com/gramework/gramework/infrastructure
+# github.com/gramework/runtimer v0.0.0-20190401193044-e6c0280ee15a
+github.com/gramework/runtimer
+# github.com/gramework/utils v0.0.0-20180427183540-d82c91416f14
+github.com/gramework/utils/nocopy
+# github.com/kirillDanshin/go-accept-headers v0.0.0-20130320203746-c78f304b1b09
+github.com/kirillDanshin/go-accept-headers
+# github.com/klauspost/compress v1.4.1
+github.com/klauspost/compress/flate
+github.com/klauspost/compress/gzip
+github.com/klauspost/compress/zlib
+# github.com/klauspost/cpuid v1.2.0
+github.com/klauspost/cpuid
+# github.com/mattn/go-colorable v0.1.1
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.5
+github.com/mattn/go-isatty
+# github.com/microcosm-cc/bluemonday v1.0.2
+github.com/microcosm-cc/bluemonday
+# github.com/pkg/errors v0.8.0
+github.com/pkg/errors
+# github.com/pquerna/ffjson v0.0.0-20181028064349-e517b90714f7
+github.com/pquerna/ffjson/ffjson
+github.com/pquerna/ffjson/fflib/v1
+github.com/pquerna/ffjson/fflib/v1/internal
+# github.com/valyala/bytebufferpool v1.0.0
+github.com/valyala/bytebufferpool
+# github.com/valyala/fasthttp v1.2.1-0.20190302200148-517df8833274
+github.com/valyala/fasthttp
+github.com/valyala/fasthttp/fasthttputil
+github.com/valyala/fasthttp/stackless
+# golang.org/x/crypto v0.0.0-20190313024323-a1f597ede03a
+golang.org/x/crypto/acme/autocert
+golang.org/x/crypto/acme
+# golang.org/x/net v0.0.0-20190318221613-d196dffd7c2b
+golang.org/x/net/html
+golang.org/x/net/html/atom
+# golang.org/x/sys v0.0.0-20190318195719-6c81ef8f67ca
+golang.org/x/sys/windows
+golang.org/x/sys/unix
