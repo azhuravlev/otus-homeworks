@@ -1,8 +1,8 @@
 version: '3'
 
 services:
-  otus_hw_ruby_app:
+  otus_hw_go_app:
     build: .
-    image: az-otus-homework-go
+    image: agzhur/az-otus-homework-go:1.1
     ports:
       - 8000:8000
