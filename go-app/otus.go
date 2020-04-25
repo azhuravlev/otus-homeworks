@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"log"
 	"net/http"
 	"os"
 )
@@ -18,8 +19,16 @@ type StatusCheck struct {
 
 func main() {
 	parseFlags()
-	serverPort := fmt.Sprintf(":%d", viper.GetInt("port"))
 
+	if len(viper.GetString("migrate")) > 0 {
+		err := runMigrations(viper.GetString("migrate"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		os.Exit(0)
+	}
+
+	serverPort := fmt.Sprintf(":%d", viper.GetInt("port"))
 	router := gin.Default()
 
 	router.GET("/", func(c *gin.Context) {
