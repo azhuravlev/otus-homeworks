@@ -1,12 +1,12 @@
 FROM golang:1.12.17
 MAINTAINER Alexey Zhuravlev <alexey.g.zhuravlev@gmail.com>
-LABEL Description="AZ OtusHomework Golang" Version="1.1"
+LABEL Description="AZ OtusHomework Golang" Version="1.2"
 
 WORKDIR /go-app
 COPY go.mod .
-COPY otus.go .
+COPY *.go ./
 RUN go mod download \
-  && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o otus -i otus.go
+  && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o otus -i .
 
 FROM alpine:latest
 WORKDIR /root/

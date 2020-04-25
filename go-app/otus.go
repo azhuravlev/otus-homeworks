@@ -26,7 +26,7 @@ func main() {
 		hostName, err := os.Hostname()
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{ "error": err.Error() })
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		} else {
 			c.JSON(http.StatusOK, HostCheck{hostName})
 		}
