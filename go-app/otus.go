@@ -26,7 +26,7 @@ func main() {
 		hostName, err := os.Hostname()
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			errResponse(c, err)
 		} else {
 			c.JSON(http.StatusOK, HostCheck{hostName})
 		}
@@ -36,5 +36,11 @@ func main() {
 		c.JSON(http.StatusOK, StatusCheck{"OK"})
 	})
 
+	initUsersEndpoints(router)
+
 	router.Run(serverPort)
+}
+
+func errResponse(c *gin.Context, err error) {
+	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 }
