@@ -1,7 +1,10 @@
 package main
 
 import (
-	"github.com/gramework/gramework"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
+	"net/http"
 	"os"
 )
 
@@ -14,16 +17,24 @@ type StatusCheck struct {
 }
 
 func main() {
-	app := gramework.New()
+	parseFlags()
+	serverPort := fmt.Sprintf(":%d", viper.GetInt("port"))
 
-	app.GET("/", func() interface{} {
-		hostName,_ := os.Hostname()
-		return HostCheck{hostName}
+	router := gin.Default()
+
+	router.GET("/", func(c *gin.Context) {
+		hostName, err := os.Hostname()
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{ "error": err.Error() })
+		} else {
+			c.JSON(http.StatusOK, HostCheck{hostName})
+		}
 	})
 
-	app.GET("/health/", func() interface{} {
-		return StatusCheck{"OK"}
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, StatusCheck{"OK"})
 	})
 
-	app.ListenAndServe()
+	router.Run(serverPort)
 }

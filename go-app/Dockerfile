@@ -1,6 +1,6 @@
 FROM golang:1.12.17
 MAINTAINER Alexey Zhuravlev <alexey.g.zhuravlev@gmail.com>
-LABEL Description="AZ OtusHomework Golang" Version="1.0"
+LABEL Description="AZ OtusHomework Golang" Version="1.1"
 
 WORKDIR /go-app
 COPY go.mod .
@@ -12,4 +12,4 @@ FROM alpine:latest
 WORKDIR /root/
 COPY --from=0 /go-app .
 EXPOSE 8000
-CMD ["./otus", "-bind", "0.0.0.0:8000"]
+CMD ["./otus", "-p", "8000"]

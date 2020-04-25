@@ -3,6 +3,6 @@ version: '3'
 services:
   otus_hw_go_app:
     build: .
-    image: agzhur/az-otus-homework-go:1.1
+    image: agzhur/az-otus-homework-go:1.2
     ports:
       - 8000:8000
