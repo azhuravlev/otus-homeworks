@@ -15,4 +15,7 @@ func parseFlags() {
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
 		log.Fatal(err)
 	}
+
+	viper.SetEnvPrefix("az_otus")
+	viper.AutomaticEnv()
 }
