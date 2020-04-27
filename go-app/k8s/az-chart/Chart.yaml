@@ -1,0 +1,15 @@
+apiVersion: v2
+name: az-chart
+description: AZ Otus homework Helm chart
+type: application
+version: 0.1.1
+appVersion: 1.4
+selectorLabels: az-otus-homework-go
+
+dependencies:
+  - name: mariadb
+    version: 7.3.21
+    repository: https://charts.bitnami.com/bitnami
+    condition: mysql.enabled
+    tags:
+      - az-database

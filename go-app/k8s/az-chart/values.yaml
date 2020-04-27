@@ -1,0 +1,60 @@
+replicaCount: 2
+
+image:
+  repository: agzhur/az-otus-homework-go
+  pullPolicy: IfNotPresent
+  tag: 1.4
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+
+service:
+  type: NodePort
+  port: 8000
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  hosts:
+    - host: arch.homework
+      paths:
+        - /otusapp($|/)(.*)
+  tls: []
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+mariadb:
+  enabled: true
+  nameOverride: az-chart-mariadb
+  service:
+    port: "3306"
+  replication:
+    enabled: false
+  db:
+    name: az_db
+    user: az_otus
+    password: azPassword
