@@ -233,19 +233,19 @@
 	],
 	"variable": [
 		{
-			"id": "78ca739a-2b12-4fe9-8cc1-2482b5f645f9",
+			"id": "a5844828-bfc2-45d4-869a-1fb05d119b66",
 			"key": "userId",
 			"value": 1,
 			"type": "number"
 		},
 		{
-			"id": "9f6e072f-920d-42fe-8c80-83ebcba23e14",
+			"id": "3490cbc0-489c-4460-b7cf-d0097fc4f9b9",
 			"key": "baseUrl",
-			"value": "172.17.0.2/otusapp",
+			"value": "arch.homework/otusapp",
 			"type": "string"
 		},
 		{
-			"id": "de6e306f-41c8-42a8-b907-4e7f70779d44",
+			"id": "c7735c96-f1cb-4d54-9e01-dcd98d126d9a",
 			"key": "hostname",
 			"value": "arch.homework",
 			"type": "string"
