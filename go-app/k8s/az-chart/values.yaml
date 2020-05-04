@@ -58,3 +58,8 @@ mariadb:
     name: az_db
     user: az_otus
     password: azPassword
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: monitoring
