@@ -30,6 +30,7 @@ func main() {
 
 	serverPort := fmt.Sprintf(":%d", viper.GetInt("port"))
 	router := gin.Default()
+	initMetrics(router)
 
 	router.GET("/", func(c *gin.Context) {
 		hostName, err := os.Hostname()
