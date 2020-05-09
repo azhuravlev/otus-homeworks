@@ -1,24 +1,14 @@
 package main
 
 import (
+	"github.com/chenjiandongx/ginprom"
 	"github.com/gin-gonic/gin"
-	ginprometheus "github.com/zsais/go-gin-prometheus"
-	"strings"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func initMetrics(router *gin.Engine) {
-	prom := ginprometheus.NewPrometheus("gin")
+	router.Use(ginprom.PromMiddleware(nil))
 
-	prom.ReqCntURLLabelMappingFn = func(c *gin.Context) string {
-		url := c.Request.URL.Path
-		for _, param := range c.Params {
-			if param.Key == "id" {
-				url = strings.Replace(url, param.Value, ":id", 1)
-				break
-			}
-		}
-		return url
-	}
-
-	prom.Use(router)
+	// register the `/metrics` route.
+	router.GET("/metrics", ginprom.PromHandler(promhttp.Handler()))
 }
