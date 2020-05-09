@@ -3,7 +3,7 @@ replicaCount: 2
 image:
   repository: agzhur/az-otus-homework-go
   pullPolicy: IfNotPresent
-  tag: 1.4
+  tag: 1.5
 
 imagePullSecrets: []
 nameOverride: ""
@@ -25,6 +25,10 @@ ingress:
       paths:
         - /otusapp($|/)(.*)
   tls: []
+
+metrics:
+  serviceMonitor:
+    enabled: true
 
 resources:
   limits:
