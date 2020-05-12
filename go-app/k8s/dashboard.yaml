@@ -23,8 +23,8 @@ data:
       "editable": true,
       "gnetId": null,
       "graphTooltip": 0,
-      "id": 2,
-      "iteration": 1589137401967,
+      "id": 13,
+      "iteration": 1589271385957,
       "links": [],
       "panels": [
       {
@@ -117,6 +117,41 @@ data:
         }
       },
       {
+        "alert": {
+          "alertRuleTags": {},
+          "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                210
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+          ],
+          "executionErrorState": "alerting",
+          "for": "5m",
+          "frequency": "1m",
+          "handler": 1,
+          "name": "ErrorRate alert",
+          "noDataState": "no_data",
+          "notifications": []
+        },
         "aliasColors": {},
         "bars": false,
         "dashLength": 10,
@@ -132,6 +167,7 @@ data:
         },
         "hiddenSeries": false,
         "id": 7,
+        "interval": "",
         "legend": {
           "alignAsTable": true,
           "avg": true,
@@ -158,13 +194,21 @@ data:
         "steppedLine": false,
         "targets": [
         {
-          "expr": "sum(rate(service_http_request_count_total{status=~\"(4|5)\\\\d+\"}[1m])) by (exported_endpoint, method, status)",
+          "expr": "sum(increase(service_http_request_count_total{status=~\"(4|5)\\\\d+\"}[1m])) by (exported_endpoint, method, status)",
           "interval": "",
           "legendFormat": "{{method}} {{exported_endpoint}} {{status}}",
           "refId": "A"
         }
         ],
-        "thresholds": [],
+        "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 210
+        }
+        ],
         "timeFrom": null,
         "timeRegions": [],
         "timeShift": null,
@@ -295,6 +339,41 @@ data:
         }
       },
       {
+        "alert": {
+          "alertRuleTags": {},
+          "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                205
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+          ],
+          "executionErrorState": "alerting",
+          "for": "5m",
+          "frequency": "1m",
+          "handler": 1,
+          "name": "Nginx - ErrorRate alert",
+          "noDataState": "no_data",
+          "notifications": []
+        },
         "aliasColors": {},
         "bars": false,
         "dashLength": 10,
@@ -342,7 +421,15 @@ data:
           "refId": "A"
         }
         ],
-        "thresholds": [],
+        "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 205
+        }
+        ],
         "timeFrom": null,
         "timeRegions": [],
         "timeShift": null,
@@ -1247,8 +1334,43 @@ data:
         }
       },
       {
+        "alert": {
+          "alertRuleTags": {},
+          "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.1
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+          ],
+          "executionErrorState": "alerting",
+          "for": "5m",
+          "frequency": "1m",
+          "handler": 1,
+          "name": "Nginx - Latency - 0.99 alert",
+          "noDataState": "no_data",
+          "notifications": []
+        },
         "aliasColors": {},
-        "bars": true,
+        "bars": false,
         "dashLength": 10,
         "dashes": false,
         "datasource": "Prometheus",
@@ -1294,7 +1416,15 @@ data:
           "refId": "A"
         }
         ],
-        "thresholds": [],
+        "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 0.1
+        }
+        ],
         "timeFrom": null,
         "timeRegions": [],
         "timeShift": null,
@@ -1336,6 +1466,41 @@ data:
         }
       },
       {
+        "alert": {
+          "alertRuleTags": {},
+          "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.3
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+          ],
+          "executionErrorState": "alerting",
+          "for": "5m",
+          "frequency": "1m",
+          "handler": 1,
+          "name": "Latency - 0.99 alert",
+          "noDataState": "no_data",
+          "notifications": []
+        },
         "aliasColors": {},
         "bars": false,
         "dashLength": 10,
@@ -1383,7 +1548,15 @@ data:
           "refId": "A"
         }
         ],
-        "thresholds": [],
+        "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 0.3
+        }
+        ],
         "timeFrom": null,
         "timeRegions": [],
         "timeShift": null,
@@ -1425,6 +1598,41 @@ data:
         }
       },
       {
+        "alert": {
+          "alertRuleTags": {},
+          "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.111
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+          ],
+          "executionErrorState": "alerting",
+          "for": "5m",
+          "frequency": "1m",
+          "handler": 1,
+          "name": "Latency - 0.95 alert",
+          "noDataState": "no_data",
+          "notifications": []
+        },
         "aliasColors": {},
         "bars": false,
         "dashLength": 10,
@@ -1472,7 +1680,15 @@ data:
           "refId": "A"
         }
         ],
-        "thresholds": [],
+        "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 0.111
+        }
+        ],
         "timeFrom": null,
         "timeRegions": [],
         "timeShift": null,
@@ -1514,6 +1730,41 @@ data:
         }
       },
       {
+        "alert": {
+          "alertRuleTags": {},
+          "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.005
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+          ],
+          "executionErrorState": "alerting",
+          "for": "5m",
+          "frequency": "1m",
+          "handler": 1,
+          "name": "Latency - 0.5 alert",
+          "noDataState": "no_data",
+          "notifications": []
+        },
         "aliasColors": {},
         "bars": false,
         "dashLength": 10,
@@ -1561,7 +1812,15 @@ data:
           "refId": "A"
         }
         ],
-        "thresholds": [],
+        "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 0.005
+        }
+        ],
         "timeFrom": null,
         "timeRegions": [],
         "timeShift": null,
@@ -1638,8 +1897,8 @@ data:
         {
           "allValue": null,
           "current": {
-            "text": "172.18.0.10:9104",
-            "value": "172.18.0.10:9104"
+            "text": "172.18.0.4:9104",
+            "value": "172.18.0.4:9104"
           },
           "datasource": "Prometheus",
           "definition": "label_values(mysql_up, instance)",
@@ -1687,5 +1946,5 @@ data:
       "variables": {
         "list": []
       },
-      "version": 20
+      "version": 3
     }
