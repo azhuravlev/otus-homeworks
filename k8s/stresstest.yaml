@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: az-go-app-ab
+spec:
+  template:
+    metadata:
+      name: az-go-app-ab
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: post-install-job
+          image: httpd
+          env:
+            - name: APP_URL
+              value: arch.homework/otusapp
+          command:
+            - bash
+            - "-c"
+            - |
+              echo $APP_URL;
+              while true; do
+                ab -n 20 -c 1 -H 'Host: arch.homework' $APP_URL/users;
+                ab -n 20 -c 1 -H 'Host: arch.homework' $APP_URL/;
+                ab -n 10 -c 1 -m POST -H 'Host: arch.homework' $APP_URL/users;
+                ab -n 5 -c 1 -H 'Host: arch.homework' $APP_URL/users/12333;
+                sleep 1;
+              done
+  backoffLimit: 2
