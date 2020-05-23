@@ -16,6 +16,7 @@ type User struct {
 	Id        int       `json:"id"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
+	Password  string    `json:"password,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -166,11 +167,11 @@ func createUser(newData *User) (ExecStats, error) {
 	if err != nil {
 		return res, err
 	}
-	createStatement, err := db.Prepare("INSERT INTO users(name, email, created_at, updated_at ) VALUES(?,?,?,?)")
+	createStatement, err := db.Prepare("INSERT INTO users(name, email, password, created_at, updated_at ) VALUES(?,?,?,?,?)")
 	if err != nil {
 		return res, err
 	}
-	created, err := createStatement.Exec(newData.Name, newData.Email, time.Now(), time.Now())
+	created, err := createStatement.Exec(newData.Name, newData.Email, newData.Password, time.Now(), time.Now())
 	if err != nil {
 		return res, err
 	}
