@@ -207,6 +207,143 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Messages list",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Host",
+						"value": "{{hostname}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/messages",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "offset",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create message",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9234514b-b0b4-4622-bb31-cac13b0e2708",
+						"exec": [
+							"var affectedStat = JSON.parse(responseBody);",
+							"pm.collectionVariables.set(\"userId\", affectedStat[\"last_insert_id\"])"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Host",
+						"value": "{{hostname}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"TestTesovich\",\n\t\"email\": \"rtest@test.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get message",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/{{userId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete message",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Host",
+						"type": "text",
+						"value": "{{hostname}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/messages/{{messageId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages",
+						"{{messageId}}"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
@@ -233,22 +370,28 @@
 	],
 	"variable": [
 		{
-			"id": "a5844828-bfc2-45d4-869a-1fb05d119b66",
+			"id": "cf788f15-e86f-4194-ab29-6e10916fde32",
 			"key": "userId",
 			"value": 1,
 			"type": "number"
 		},
 		{
-			"id": "3490cbc0-489c-4460-b7cf-d0097fc4f9b9",
+			"id": "875177f6-6fff-4527-89c3-fd0708765d57",
 			"key": "baseUrl",
 			"value": "arch.homework/otusapp",
 			"type": "string"
 		},
 		{
-			"id": "c7735c96-f1cb-4d54-9e01-dcd98d126d9a",
+			"id": "e1460b22-042d-4011-b6f2-ecce1732f56b",
 			"key": "hostname",
 			"value": "arch.homework",
 			"type": "string"
+		},
+		{
+			"id": "c873a14d-db74-4bf7-8d16-8f33602c0556",
+			"key": "messageId",
+			"value": 1,
+			"type": "number"
 		}
 	],
 	"protocolProfileBehavior": {}

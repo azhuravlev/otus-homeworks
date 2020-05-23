@@ -47,6 +47,7 @@ func main() {
 	})
 
 	initUsersEndpoints(router)
+	initMessagesEndpoints(router)
 
 	router.Run(serverPort)
 }
