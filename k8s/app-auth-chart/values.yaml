@@ -1,0 +1,42 @@
+replicaCount: 1
+
+image:
+  repository: agzhur/az-otus-homework-go-auth
+  pullPolicy: IfNotPresent
+  tag: "1.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+
+service:
+  type: NodePort
+  port: 8000
+
+metrics:
+  serviceMonitor:
+    enabled: true
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+mariadb:
+  label: mariadb
+  service:
+    port: "3306"
+  db:
+    name: az_db
+    user: az_otus
+    password: azPassword
+
+ingress: {}
+autoscaling:
+  enabled: false
+nodeSelector: {}
+tolerations: []
+affinity: {}

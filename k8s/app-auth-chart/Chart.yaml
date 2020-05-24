@@ -1,0 +1,7 @@
+apiVersion: v2
+name: app-auth-chart
+description: AZ Otus homework AuthApp Helm chart
+type: application
+version: 0.1.0
+appVersion: 1.0
+selectorLabels: az-otus-homework-go-auth

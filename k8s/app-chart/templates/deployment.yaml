@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "az-chart.fullname" . }}
+  name: {{ include "app-chart.fullname" . }}
   labels:
-    {{- include "az-chart.labels" . | nindent 4 }}
+    {{- include "app-chart.labels" . | nindent 4 }}
 spec:
 {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
 {{- end }}
   selector:
     matchLabels:
-      {{- include "az-chart.selectorLabels" . | nindent 6 }}
+      {{- include "app-chart.selectorLabels" . | nindent 6 }}
   template:
     metadata:
     {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       labels:
-        {{- include "az-chart.selectorLabels" . | nindent 8 }}
+        {{- include "app-chart.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "az-chart.serviceAccountName" . }}
+      serviceAccountName: {{ include "app-chart.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
@@ -35,7 +35,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   key: MARIADB_PATH
-                  name: {{ include "az-chart.fullname" . }}
+                  name: {{ include "app-chart.fullname" . }}
           command: ["sh", "-c", "until nc -zv $AZ_OTUS_DB_PATH; do echo waiting for mysql; sleep 2; done;"]
         - name: {{ .Chart.Name }}-migrations
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -45,7 +45,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: DATABASE_URI
-                  name: {{ include "az-chart.fullname" . }}
+                  name: {{ include "app-chart.fullname" . }}
           command: ["sh", "-c", "./otus -m up; exit 0;"]
       containers:
         - name: {{ .Chart.Name }}
@@ -58,7 +58,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: DATABASE_URI
-                  name: {{ include "az-chart.fullname" . }}
+                  name: {{ include "app-chart.fullname" . }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

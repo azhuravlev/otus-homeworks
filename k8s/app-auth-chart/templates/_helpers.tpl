@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "az-chart.name" -}}
+{{- define "app-auth-chart.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "az-chart.fullname" -}}
+{{- define "app-auth-chart.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -27,16 +27,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "az-chart.chart" -}}
+{{- define "app-auth-chart.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "az-chart.labels" -}}
-helm.sh/chart: {{ include "az-chart.chart" . }}
-{{ include "az-chart.selectorLabels" . }}
+{{- define "app-auth-chart.labels" -}}
+helm.sh/chart: {{ include "app-auth-chart.chart" . }}
+{{ include "app-auth-chart.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -46,17 +46,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "az-chart.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "az-chart.name" . }}
+{{- define "app-auth-chart.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "app-auth-chart.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "az-chart.serviceAccountName" -}}
+{{- define "app-auth-chart.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "az-chart.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "app-auth-chart.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
