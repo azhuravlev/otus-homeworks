@@ -46,8 +46,8 @@ func main() {
 		c.JSON(http.StatusOK, StatusCheck{"OK"})
 	})
 
-	initUsersEndpoints(router)
 	initMessagesEndpoints(router)
+	initUsersEndpoints(router)
 
 	router.Run(serverPort)
 }

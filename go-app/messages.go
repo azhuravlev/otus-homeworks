@@ -52,16 +52,28 @@ func initMessagesEndpoints(router *gin.Engine) {
 	})
 
 	router.POST("/messages", func(c *gin.Context) {
+		authUserId, err := strconv.Atoi(c.GetHeader("X-User-Id"))
+		if err != nil || authUserId == 0 {
+			c.JSON(http.StatusUnprocessableEntity, err)
+			return
+		}
+
 		message := Message{}
+
 		if err := c.ShouldBind(&message); err != nil {
 			errResponse(c, err)
 			return
 		}
+
+		message.UserId = authUserId
+		message.UserName = c.GetHeader("X-User-Name")
+
 		stat, err := createMessage(&message)
 		if err != nil {
 			errResponse(c, err)
 			return
 		}
+
 		c.JSON(http.StatusOK, stat)
 	})
 
@@ -80,6 +92,12 @@ func initMessagesEndpoints(router *gin.Engine) {
 	})
 
 	router.PUT("/messages/:id", func(c *gin.Context) {
+		authUserId, err := strconv.Atoi(c.GetHeader("X-User-Id"))
+		if err != nil || authUserId == 0 {
+			c.JSON(http.StatusUnprocessableEntity, err)
+			return
+		}
+
 		message, err := getMessageById(c.Param("id"))
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -93,6 +111,17 @@ func initMessagesEndpoints(router *gin.Engine) {
 			errResponse(c, err)
 			return
 		}
+
+		dbMessage, err := getMessageById(c.Param("id"))
+		if err != nil {
+			errResponse(c, err)
+			return
+		}
+		if dbMessage.UserId != authUserId {
+			c.JSON(http.StatusUnauthorized, "Not my message")
+			return
+		}
+
 		stat, err := updateMessageById(c.Param("id"), message)
 		if err != nil {
 			errResponse(c, err)
@@ -102,13 +131,24 @@ func initMessagesEndpoints(router *gin.Engine) {
 	})
 
 	router.DELETE("/messages/:id", func(c *gin.Context) {
-		_, err := getMessageById(c.Param("id"))
+		authUserId, err := strconv.Atoi(c.GetHeader("X-User-Id"))
+		if err != nil || authUserId == 0 {
+			c.JSON(http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		dbMessage, err := getMessageById(c.Param("id"))
 		if err != nil {
 			if err == sql.ErrNoRows {
 				c.JSON(http.StatusNotFound, gin.H{})
 			} else {
 				errResponse(c, err)
 			}
+			return
+		}
+
+		if dbMessage.UserId != authUserId {
+			c.JSON(http.StatusUnauthorized, "Not my message")
 			return
 		}
 

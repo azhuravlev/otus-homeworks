@@ -22,6 +22,24 @@ type User struct {
 }
 
 func initUsersEndpoints(router *gin.Engine) {
+	router.GET("/users/me", func(c *gin.Context) {
+		authUserId, err := strconv.Atoi(c.GetHeader("X-User-Id"))
+		if err != nil || authUserId == 0 {
+			c.JSON(http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		user := User{
+			Id:        authUserId,
+			Name:      c.GetHeader("X-User-Name"),
+			Email:     c.GetHeader("X-User-Email"),
+		}
+
+		c.JSON(http.StatusOK, user)
+	})
+}
+
+func initAdminUsersEndpoints(router *gin.Engine) {
 	router.GET("/users", func(c *gin.Context) {
 		var err error
 		limit := 10
