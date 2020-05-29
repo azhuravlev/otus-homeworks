@@ -3,10 +3,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
-	"github.com/spf13/viper"
 	"net/http"
 	"time"
 )
@@ -19,8 +17,6 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
-
-const JWTLifeTime = time.Minute * 5
 
 func initUsersEndpoints(router *gin.Engine) {
 	router.POST("/register", func(c *gin.Context) {
@@ -59,7 +55,7 @@ func initUsersEndpoints(router *gin.Engine) {
 			return
 		}
 
-		token, err := createToken(dbUser)
+		token, err := createJWT(dbUser)
 
 		if err != nil {
 			errResponse(c, err)
@@ -139,25 +135,4 @@ func fetchDBUser(user *User, row interface{}) error {
 		user.UpdatedAt = user.CreatedAt
 	}
 	return nil
-}
-
-func createToken(user *User) (string, error) {
-	var err error
-	secret := viper.GetString("secret")
-
-	atClaims := jwt.MapClaims{}
-	atClaims["authorized"] = true
-	atClaims["user_id"] = user.Id
-	atClaims["user_name"] = user.Name
-	atClaims["user_email"] = user.Email
-	atClaims["exp"] = time.Now().Add(JWTLifeTime).Unix()
-
-	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-	token, err := at.SignedString([]byte(secret))
-
-	if err != nil {
-		return "", err
-	}
-
-	return token, nil
 }

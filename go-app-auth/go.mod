@@ -11,4 +11,5 @@ require (
 	github.com/prometheus/client_golang v1.6.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.0
+	gopkg.in/square/go-jose.v2 v2.5.1
 )

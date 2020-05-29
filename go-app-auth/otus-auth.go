@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"log"
 	"net/http"
 	"os"
 )
@@ -18,6 +19,11 @@ type StatusCheck struct {
 
 func main() {
 	parseFlags()
+
+	if err := initJWTSecrets(); err != nil {
+		log.Fatal(err)
+	}
+
 	serverPort := fmt.Sprintf(":%d", viper.GetInt("port"))
 	router := gin.Default()
 	initMetrics(router)
@@ -37,6 +43,7 @@ func main() {
 	})
 
 	initUsersEndpoints(router)
+	initJWKsEndpoint(router)
 
 	router.Run(serverPort)
 }
