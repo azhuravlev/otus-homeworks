@@ -29,7 +29,7 @@ func runMigrations(dir string) error {
 	if err != nil {
 		return err
 	}
-	//defer m.Close()
+	defer m.Close()
 	if strings.ToLower(dir) == "up" {
 		err = m.Up()
 		if err != nil {

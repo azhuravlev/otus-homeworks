@@ -21,21 +21,32 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type MeResponse struct {
+	Id         int    `json:"id"`
+	Name       string `json:"name"`
+	Email      string `json:"email"`
+	Authorized bool   `json:"auth"`
+	Token      string `json:"token"`
+}
+
 func initUsersEndpoints(router *gin.Engine) {
 	router.GET("/users/me", func(c *gin.Context) {
 		authUserId, err := strconv.Atoi(c.GetHeader("X-User-Id"))
 		if err != nil || authUserId == 0 {
 			c.JSON(http.StatusUnprocessableEntity, err)
+			fmt.Printf("Headers: %v+", c.Request.Header)
 			return
 		}
 
-		user := User{
-			Id:        authUserId,
-			Name:      c.GetHeader("X-User-Name"),
-			Email:     c.GetHeader("X-User-Email"),
+		response := MeResponse{
+			Id:         authUserId,
+			Name:       c.GetHeader("X-User-Name"),
+			Email:      c.GetHeader("X-User-Email"),
+			Authorized: c.GetHeader("X-Authorized") == "true",
+			Token:      c.GetHeader("X-Token-String"),
 		}
 
-		c.JSON(http.StatusOK, user)
+		c.JSON(http.StatusOK, response)
 	})
 }
 

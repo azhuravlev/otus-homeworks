@@ -6,6 +6,6 @@ CREATE TABLE `messages` (
   `user_name` varchar(255) NOT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  INDEX (user_id)
 ) DEFAULT CHARSET=utf8;
-CREATE INDEX messages_user_id_index ON messages (user_id);
