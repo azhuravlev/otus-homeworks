@@ -1,0 +1,734 @@
+{
+	"info": {
+		"_postman_id": "9496237b-aa68-40a5-a924-19f412b7a1e1",
+		"name": "AZOtusGo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Регистрируем пользователя",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ca3a584a-3bc3-4c09-ba96-3b7e381e77f3",
+						"exec": [
+							"var affectedStat = JSON.parse(responseBody);",
+							"pm.collectionVariables.set(\"userId\", affectedStat[\"last_insert_id\"])"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0762cadb-bdb9-4a26-b7cc-530cf60e5037",
+						"exec": [
+							"pm.collectionVariables.set(\"name\", pm.variables.replaceIn('{{$randomFullName}}'))",
+							"pm.collectionVariables.set(\"email\", pm.variables.replaceIn('{{$randomEmail}}'))",
+							"pm.collectionVariables.set(\"password\", pm.variables.replaceIn('{{$randomPassword}}'))"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Host",
+						"type": "text",
+						"value": "{{hostname}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"{{name}}\",\n\t\"email\": \"{{email}}\",\n\t\"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/auth/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Авторизуем пользователя",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "65925745-00da-4aa5-b609-f5e55306184f",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "0ba53d85-5f95-4715-bc46-68165b5c0eb1",
+						"exec": [
+							"var token = JSON.parse(responseBody)[\"token\"];",
+							"pm.collectionVariables.set(\"jwt\", token)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Host",
+						"type": "text",
+						"value": "{{hostname}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"{{email}}\",\n\t\"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/auth/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Читаем данные пользователя",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "01fe6b35-7dec-4d2f-b24c-749782795b6b",
+						"exec": [
+							"var affectedStat = JSON.parse(responseBody);",
+							"pm.collectionVariables.set(\"userId\", affectedStat[\"last_insert_id\"])"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a1c0c66d-d88a-4b0a-b0a6-8f5b5a1c057c",
+						"exec": [
+							"pm.collectionVariables.set(\"name\", pm.variables.replaceIn('{{$randomFullName}}'))",
+							"pm.collectionVariables.set(\"email\", pm.variables.replaceIn('{{$randomEmail}}'))",
+							"pm.collectionVariables.set(\"password\", pm.variables.replaceIn('{{$randomPassword}}'))"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Host",
+						"type": "text",
+						"value": "{{hostname}}"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": {{name}},\n\t\"email\": {{email}},\n\t\"password\": {{password}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users/me",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Читаем список сообщений",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Host",
+						"type": "text",
+						"value": "{{hostname}}"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/messages",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "offset",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Создаём своё сообщение",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9234514b-b0b4-4622-bb31-cac13b0e2708",
+						"exec": [
+							"var affectedStat = JSON.parse(responseBody);",
+							"pm.collectionVariables.set(\"messageId\", affectedStat[\"last_insert_id\"])"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "18ba7139-ff18-4509-ada0-702f772eace2",
+						"exec": [
+							"pm.collectionVariables.set(\"subject\", pm.variables.replaceIn('{{$randomPhrase}}'))",
+							"pm.collectionVariables.set(\"body\", pm.variables.replaceIn('{{$randomLoremParagraph}}'))"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Host",
+						"type": "text",
+						"value": "{{hostname}}"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"subject\": \"Hello\",\n\t\"body\": \"TestMessage\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/messages",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Читаем список сообщений",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Host",
+						"type": "text",
+						"value": "{{hostname}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/messages",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "offset",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Регистрируем нового пользователя",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a132f677-fe8a-4c2a-941c-c17e7ec9b74a",
+						"exec": [
+							"var affectedStat = JSON.parse(responseBody);",
+							"pm.collectionVariables.set(\"userId\", affectedStat[\"last_insert_id\"])"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3a8be362-6384-4e6d-888b-730b8f098b2c",
+						"exec": [
+							"pm.collectionVariables.set(\"name\", pm.variables.replaceIn('{{$randomFullName}}'))",
+							"pm.collectionVariables.set(\"email\", pm.variables.replaceIn('{{$randomEmail}}'))",
+							"pm.collectionVariables.set(\"password\", pm.variables.replaceIn('{{$randomPassword}}'))"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Host",
+						"type": "text",
+						"value": "{{hostname}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"{{name}}\",\n\t\"email\": \"{{email}}\",\n\t\"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/auth/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Авторизуем нового пользователя",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "04eb14a1-5738-466e-8047-0f9139762e66",
+						"exec": [
+							"var token = JSON.parse(responseBody)[\"token\"];",
+							"pm.collectionVariables.set(\"jwt\", token)"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "01e184ad-0035-43a0-852f-a2b9eb062326",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Host",
+						"type": "text",
+						"value": "{{hostname}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"{{email}}\",\n\t\"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/auth/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Читаем чужое сообщение",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Host",
+						"value": "{{hostname}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/messages/{{messageId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages",
+						"{{messageId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Пытаемся удалить чужое сообщение",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Host",
+						"type": "text",
+						"value": "{{hostname}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/messages/{{messageId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages",
+						"{{messageId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Создаём своё сообщение",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7ecfc7f7-0249-481a-ac01-ebd282787867",
+						"exec": [
+							"var affectedStat = JSON.parse(responseBody);",
+							"pm.collectionVariables.set(\"messageId\", affectedStat[\"last_insert_id\"])"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Host",
+						"type": "text",
+						"value": "{{hostname}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"subject\": \"Hello\",\n\t\"body\": \"TestMessage\",\n\t\"user_id\": {{userId}},\n\t\"user_name\": \"Vasya\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/messages",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Удаляем своё сообщение",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"host": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Host",
+						"type": "text",
+						"value": "{{hostname}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/messages/{{messageId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages",
+						"{{messageId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "da6c7c53-65f2-4fd6-8e7f-fac960000e93",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "d80e8f40-8d22-439a-8757-bc1be29ac852",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "313ca1ac-186e-468b-b28f-5b693040cd14",
+			"key": "baseUrl",
+			"value": "arch.homework/otusapp",
+			"type": "string"
+		},
+		{
+			"id": "e2dd20d8-62b3-4fa6-b1b4-20f7a348ebcd",
+			"key": "hostname",
+			"value": "arch.homework",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

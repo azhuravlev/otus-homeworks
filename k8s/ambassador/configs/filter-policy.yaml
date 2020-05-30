@@ -8,3 +8,11 @@ spec:
       path: "/users/me"
       filters:
         - name: "az-app-jwt-filter"
+    - host: "*"
+      path: "/messages"
+      filters:
+        - name: "az-app-jwt-filter"
+    - host: "*"
+      path: "/messages/*"
+      filters:
+        - name: "az-app-jwt-filter"

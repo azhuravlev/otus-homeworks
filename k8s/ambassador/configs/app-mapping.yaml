@@ -1,8 +1,17 @@
 apiVersion: getambassador.io/v2
 kind:  Mapping
 metadata:
-  name:  az-app-mapping
+  name:  az-app-users-mapping
 spec:
   prefix: /users/me
+  service: az-app:8000
+  rewrite: ""
+---
+apiVersion: getambassador.io/v2
+kind:  Mapping
+metadata:
+  name:  az-app-messages-mapping
+spec:
+  prefix: /messages
   service: az-app:8000
   rewrite: ""
