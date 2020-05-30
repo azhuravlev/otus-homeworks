@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "app-chart.fullname" . }}
+  name: {{ include "az-app.fullname" . }}
 data:
   MARIADB_PATH: {{ printf "%s:%s" .Values.mariadb.label .Values.mariadb.service.port }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ include "app-chart.fullname" . }}
+  name: {{ include "az-app.fullname" . }}
 type: Opaque
 data:
   DATABASE_URI: {{ printf "%s:%s@tcp(%s:%s)/%s" .Values.mariadb.db.user .Values.mariadb.db.password .Values.mariadb.label .Values.mariadb.service.port .Values.mariadb.db.name | b64enc | quote }}

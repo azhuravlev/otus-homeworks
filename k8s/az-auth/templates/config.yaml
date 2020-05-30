@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "app-auth-chart.fullname" . }}
+  name: {{ include "az-auth.fullname" . }}
 data:
   MARIADB_PATH: {{ printf "%s:%s" .Values.mariadb.label .Values.mariadb.service.port }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ include "app-auth-chart.fullname" . }}
+  name: {{ include "az-auth.fullname" . }}
 type: Opaque
 data:
   DATABASE_URI: {{ printf "%s:%s@tcp(%s:%s)/%s" .Values.mariadb.db.user .Values.mariadb.db.password .Values.mariadb.label .Values.mariadb.service.port .Values.mariadb.db.name | b64enc | quote }}
-  SECRET: {{ "aaaBBBccc" | b64enc | quote }}
+  SECRET: {{ .Values.jwt.privateKey | b64enc | quote }}

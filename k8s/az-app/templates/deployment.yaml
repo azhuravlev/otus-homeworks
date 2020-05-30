@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "app-auth-chart.fullname" . }}
+  name: {{ include "az-app.fullname" . }}
   labels:
-    {{- include "app-auth-chart.labels" . | nindent 4 }}
+    {{- include "az-app.labels" . | nindent 4 }}
 spec:
 {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
 {{- end }}
   selector:
     matchLabels:
-      {{- include "app-auth-chart.selectorLabels" . | nindent 6 }}
+      {{- include "az-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
     {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       labels:
-        {{- include "app-auth-chart.selectorLabels" . | nindent 8 }}
+        {{- include "az-app.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "app-auth-chart.serviceAccountName" . }}
+      serviceAccountName: {{ include "az-app.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
@@ -35,8 +35,18 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   key: MARIADB_PATH
-                  name: {{ include "app-auth-chart.fullname" . }}
+                  name: {{ include "az-app.fullname" . }}
           command: ["sh", "-c", "until nc -zv $AZ_OTUS_DB_PATH; do echo waiting for mysql; sleep 2; done;"]
+        - name: {{ .Chart.Name }}-migrations
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: AZ_OTUS_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: DATABASE_URI
+                  name: {{ include "az-app.fullname" . }}
+          command: ["sh", "-c", "./otus -m up; exit 0;"]
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -44,16 +54,11 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: AZ_OTUS_AUTH_DATABASE
+            - name: AZ_OTUS_DATABASE
               valueFrom:
                 secretKeyRef:
                   key: DATABASE_URI
-                  name: {{ include "app-auth-chart.fullname" . }}
-            - name: AZ_OTUS_AUTH_SECRET
-              valueFrom:
-                secretKeyRef:
-                  key: SECRET
-                  name: {{ include "app-auth-chart.fullname" . }}
+                  name: {{ include "az-app.fullname" . }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

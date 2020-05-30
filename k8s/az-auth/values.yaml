@@ -1,0 +1,73 @@
+replicaCount: 1
+
+image:
+  repository: agzhur/az-otus-homework-go-auth
+  pullPolicy: Always
+  tag: "1.4"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+
+service:
+  type: NodePort
+  port: 8000
+
+metrics:
+  serviceMonitor:
+    enabled: true
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+mariadb:
+  label: mariadb
+  service:
+    port: "3306"
+  db:
+    name: az_db
+    user: az_otus
+    password: azPassword
+
+ingress: {}
+autoscaling:
+  enabled: false
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+
+jwt:
+  privateKey: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEpQIBAAKCAQEA0GoFIustnhTd3JMgTpNkwABpWzMqOzhz1zl5mv15KD7weahQ
+    ytDQ6Q6TTb/kVj4fWcF7/hNNbdx9fAvu9zHuhx8BZi9PTKlECExKU0BKe28G9FT+
+    Wy4ubO9WHATWVdwK89Gm67cqwDzM13CnMkzghYVWtaj0FYQkuJ2hoKyAjZS1CUsn
+    wyv+oMbeCBH5dY2XFTMYDDjh7eR8nBDsmhoMEU2uX6lSBZnwJB8bQW49FkjCY3+M
+    jm0KRWANHXTGuaZ8NzXuQHYsS56u8sQ37/guUUOfIgC4eZr7RV61g4MPlt6tzLt5
+    6LahYZDRnNWs5HpeCoFYCytVSQxZnspXCUIWkwIDAQABAoIBAQC0skczyD2r4qGd
+    HX6UQdzHT1QJO2oxIDfncbCKfZuvFiq+//zUa4nFltqGPYqGb6QU2NldJ3UpfFLb
+    2yjb79HEG1DGPNx/Nf6DR0nltkcdj9yyuIIzoe2kiznYXyVKGdbxIGOd2Rhaxhw/
+    6i88QEUl3r6YEB1YDlMcMacxvH5UwPpPOdQDTj5IYCTTbkyUK6S3c4BtrHoR4Zlq
+    wds36YfvQ7WU+FanYo0IqhexoDqamd6YhGXb7/8I93g5+f53O/Rpd6xWeAcIsrq/
+    Me/zS75mN1L66GTPJQ8Qu/aqloZKlmB821pIEpExPxO7D7eThXs3S3EGt0DUsWPN
+    m2Vz2MtpAoGBAOfMolTlDna/R9yTj7u7nFpG012AKhIGntkkMVO1z4EDu4m5Hh8y
+    /UNGQbXJiusT3EBiyeO2/fE4w59AvgWKuGua17MsNeBSw0q/EgepghiuBGVzjymt
+    q9zMWd/YcEOiEzZZpRp68Kl8cHlsyEOEC7pc1V+XRDtrgglsM+f9RkPPAoGBAOYs
+    XOcL7xK8/wLz65TPA1KW1vWjilG0yUjITVt5uyx8b6/OGMgcDsfyj9yZypEYMjra
+    JMPSnk4op515FLwaz8EaP3gMuuPqytK5QmVhCjRkPZNRwLbK/Q/uKJZmudtKwkVS
+    Wh++Tr7xgqpY3VT2NWrynVTDQAsxDjJpnrJFO339AoGAPrsak28J4wkRIZitpVi4
+    j5XrTbqJqCcyhgFNeCIT7g5cioEWrcrWz4YL8m6Ase3GBYa2rHGxd76s8kRLKKTK
+    FBTrmwmz6ul7AJeFAZ3WH2e4uNv1OopNoIuNJw8kEqmiGWtZSzlKOBP9PF88M0lh
+    AyZseFovlQUbRAGMapQYl/ECgYEAnLiSHSNMCjczb4BD5JO7kG1yOdi7onx1HSB9
+    Q460OksUBOFQkFhCXDQ1biAtA/Q0p0vHAqqS7WbTEe7Shm2/DZ1gn84TJoLEzQwl
+    QD/9ocSrBHcCv7Og8UrYyedyHvVdJ7Q19y0uEucAcBqHwYTOxF4jcAZtwfEJ2Jt/
+    2aQ4KMUCgYEA34J3qAAC5RNzCMYQRrxb/QO6/rKlpQwbtIEqZhpbc2Dvew8qfHKA
+    PPFhBJ6B1Fewb4p/jgUT4wl8AvHwbA8vzO+PwLHYg9iRr152SUOQw8SiBHBV1ULy
+    ekP8pB1bB9c16tlgf6GE6KW4ocJNVCVwSeTimi2q56L2TqMbOM/cdEM=
+    -----END RSA PRIVATE KEY-----

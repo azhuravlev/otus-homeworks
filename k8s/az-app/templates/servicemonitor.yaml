@@ -2,17 +2,17 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "app-auth-chart.fullname" . }}
+  name: {{ include "az-app.fullname" . }}
   labels:
-  {{- include "app-auth-chart.labels" . | nindent 4 }}
+  {{- include "az-app.labels" . | nindent 4 }}
 spec:
-  jobLabel: {{ include "app-auth-chart.fullname" . }}
+  jobLabel: {{ include "az-app.fullname" . }}
   namespaceSelector:
     matchNames:
       - "{{ $.Release.Namespace }}"
   selector:
     matchLabels:
-  {{- include "app-auth-chart.selectorLabels" . | nindent 6 }}
+  {{- include "az-app.selectorLabels" . | nindent 6 }}
   endpoints:
     - interval: 5s
       port: http

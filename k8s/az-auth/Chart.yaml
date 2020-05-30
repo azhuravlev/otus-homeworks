@@ -1,0 +1,7 @@
+apiVersion: v2
+name: az-auth
+description: AZ Otus homework AuthApp Helm configs
+type: application
+version: 0.1.1
+appVersion: 1.4
+selectorLabels: az-otus-homework-go-auth

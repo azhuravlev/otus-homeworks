@@ -1,0 +1,27 @@
+apiVersion: getambassador.io/v2
+kind: Filter
+metadata:
+  name: "az-app-jwt-filter"
+spec:
+  JWT:
+    jwksURI: "http://az-auth:8000/.well-known/jwks.json"
+    insecureTLS: true
+    renegotiateTLS: freelyAsClient
+    validAlgorithms:
+      - "RS256"
+    requireAudience: false
+    requireIssuer: false
+    requireIssuedAt: false
+    requireExpiresAt: false
+    requireNotBefore: false
+    injectRequestHeaders:
+      - name: "X-Token-String"
+        value: "{{ .token.Raw }}"
+      - name: "X-User-Id"
+        value: "{{ .token.Claims.user_id }}"
+      - name: "X-User-Email"
+        value: "{{ .token.Claims.user_email }}"
+      - name: "X-User-Name"
+        value: "{{ .token.Claims.user_name }}"
+      - name: "X-Authorized"
+        value: "{{ .token.Claims.authorized }}"

@@ -1,17 +1,17 @@
 {{/* vim: set filetype=mustache: */}}
 {{/*
-Expand the name of the chart.
+Expand the name of the configs.
 */}}
-{{- define "app-chart.name" -}}
+{{- define "az-auth.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
+If release name contains configs name it will be used as a full name.
 */}}
-{{- define "app-chart.fullname" -}}
+{{- define "az-auth.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -25,18 +25,18 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
-Create chart name and version as used by the chart label.
+Create configs name and version as used by the configs label.
 */}}
-{{- define "app-chart.chart" -}}
+{{- define "az-auth.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "app-chart.labels" -}}
-helm.sh/chart: {{ include "app-chart.chart" . }}
-{{ include "app-chart.selectorLabels" . }}
+{{- define "az-auth.labels" -}}
+helm.sh/chart: {{ include "az-auth.chart" . }}
+{{ include "az-auth.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -46,17 +46,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "app-chart.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "app-chart.name" . }}
+{{- define "az-auth.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "az-auth.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "app-chart.serviceAccountName" -}}
+{{- define "az-auth.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "app-chart.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "az-auth.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
