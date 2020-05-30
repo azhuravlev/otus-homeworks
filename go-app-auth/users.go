@@ -62,7 +62,7 @@ func initUsersEndpoints(router *gin.Engine) {
 			return
 		}
 
-		c.JSON(http.StatusOK, token)
+		c.JSON(http.StatusOK, gin.H{"token": token})
 	})
 }
 

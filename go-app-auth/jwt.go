@@ -42,6 +42,7 @@ func initJWTSecrets() error {
 	key := jose.SigningKey{Algorithm: jose.RS256, Key: privKey}
 	var signerOpts = jose.SignerOptions{}
 	signerOpts.WithType("JWT")
+	signerOpts.WithHeader("kid", "1")
 
 	rsaSigner, err = jose.NewSigner(key, &signerOpts)
 	if err != nil {
@@ -53,7 +54,6 @@ func initJWTSecrets() error {
 		Algorithm:                   "RSA",
 	}
 	return nil
-	return nil
 }
 
 func createJWT(user *User) (string, error) {
@@ -64,6 +64,7 @@ func createJWT(user *User) (string, error) {
 		Claims: &jwt.Claims{
 			Issuer:   "goauth",
 			Subject:  "userAuth",
+			ID:		  "1",
 			Audience: jwt.Audience{"aud1", "aud2"},
 			IssuedAt: jwt.NewNumericDate(time.Now().UTC()),
 			Expiry:   jwt.NewNumericDate(time.Now().UTC().Add(JWTLifeTime)),
