@@ -32,6 +32,8 @@ func main() {
 	router := gin.Default()
 	initMetrics(router)
 
+	initCache()
+
 	router.GET("/", func(c *gin.Context) {
 		hostName, err := os.Hostname()
 

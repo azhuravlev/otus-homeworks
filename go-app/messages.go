@@ -3,8 +3,12 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/gin-contrib/cache"
+	"github.com/gin-contrib/cache/persistence"
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
+	"github.com/spf13/viper"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -23,34 +27,6 @@ type Message struct {
 }
 
 func initMessagesEndpoints(router *gin.Engine) {
-	router.GET("/messages", func(c *gin.Context) {
-		var err error
-		limit := 10
-		offset := 0
-
-		if len(c.Query("limit")) > 0 {
-			limit, err = strconv.Atoi(c.Query("limit"))
-			if err != nil {
-				errResponse(c, err)
-				return
-			}
-		}
-		if len(c.Query("offset")) > 0 {
-			offset, err = strconv.Atoi(c.Query("offset"))
-			if err != nil {
-				errResponse(c, err)
-				return
-			}
-		}
-
-		messages, err := getMessages(limit, offset)
-		if err != nil {
-			errResponse(c, err)
-			return
-		}
-		c.JSON(http.StatusOK, messages)
-	})
-
 	router.POST("/messages", func(c *gin.Context) {
 		authUserId, err := strconv.Atoi(c.GetHeader("X-User-Id"))
 		if err != nil || authUserId == 0 {
@@ -77,22 +53,16 @@ func initMessagesEndpoints(router *gin.Engine) {
 		c.JSON(http.StatusOK, stat)
 	})
 
-	router.GET("/messages/:id", func(c *gin.Context) {
-		message, err := getMessageById(c.Param("id"))
-		if err != nil {
-			if err == sql.ErrNoRows {
-				c.JSON(http.StatusNotFound, gin.H{})
-			} else {
-				errResponse(c, err)
-			}
-			return
-		}
-
-		c.JSON(http.StatusOK, message)
-	})
+	if viper.GetBool("cache-enabled") {
+		router.GET("/messages", cachePageIfValid(cacheStore, 10 * time.Minute, messagesUnchanged, readMessagesFunc()))
+		router.GET("/messages/:id", cache.CachePage(cacheStore, 10 * time.Minute, readMessageFunc()))
+	} else {
+		router.GET("/messages", readMessagesFunc())
+		router.GET("/messages/:id", readMessageFunc())
+	}
 
 	router.PUT("/messages/:id", func(c *gin.Context) {
-		authUserId, err := strconv.Atoi(c.GetHeader("X-User-Id"))
+		authUserId, err := strconv.Atoi(c.GetHeader("x	"))
 		if err != nil || authUserId == 0 {
 			c.JSON(http.StatusUnprocessableEntity, err)
 			return
@@ -159,6 +129,93 @@ func initMessagesEndpoints(router *gin.Engine) {
 		}
 		c.JSON(http.StatusOK, stat)
 	})
+}
+
+func messagesUnchanged() bool {
+	var lastUpdatedCached int64
+	key := "messages:updated"
+	lastUpdated, _ := getLastMessagesUpdatedAt()
+	if !lastUpdated.Valid {
+		return true
+	}
+
+	if err := cacheStore.Get(key, &lastUpdatedCached); err != nil {
+		if err != persistence.ErrCacheMiss {
+			log.Println(err.Error())
+		}
+		cacheStore.Add(key, lastUpdated.Time.Unix(), CacheLifeATime)
+		return false
+	}
+
+	if lastUpdated.Time.Unix() > lastUpdatedCached {
+		cacheStore.Replace(key, lastUpdated.Time.Unix(), CacheLifeATime)
+		return false
+	}
+	return true
+}
+
+func readMessagesFunc() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var err error
+		limit := 10
+		offset := 0
+
+		if len(c.Query("limit")) > 0 {
+			limit, err = strconv.Atoi(c.Query("limit"))
+			if err != nil {
+				errResponse(c, err)
+				return
+			}
+		}
+		if len(c.Query("offset")) > 0 {
+			offset, err = strconv.Atoi(c.Query("offset"))
+			if err != nil {
+				errResponse(c, err)
+				return
+			}
+		}
+
+		messages, err := getMessages(limit, offset)
+		if err != nil {
+			errResponse(c, err)
+			return
+		}
+		c.JSON(http.StatusOK, messages)
+	}
+}
+
+func readMessageFunc() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		message, err := getMessageById(c.Param("id"))
+		if err != nil {
+			if err == sql.ErrNoRows {
+				c.JSON(http.StatusNotFound, gin.H{})
+			} else {
+				errResponse(c, err)
+			}
+			return
+		}
+
+		c.JSON(http.StatusOK, message)
+	}
+}
+
+func getLastMessagesUpdatedAt() (mysql.NullTime, error) {
+	var updated mysql.NullTime
+
+	db, err := dbConn()
+	defer db.Close()
+	if err != nil {
+		return updated, err
+	}
+
+	dbRow := db.QueryRow("SELECT updated_at FROM messages ORDER BY id DESC LIMIT 1")
+	err = dbRow.Scan(&updated)
+	if err != nil {
+		return updated, err
+	}
+
+	return updated, nil
 }
 
 func getMessages(limit, offset int) (*Messages, error) {

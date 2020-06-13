@@ -10,6 +10,8 @@ func parseFlags() {
 	pflag.IntP("port", "p", 8000, "HTTP server binding port")
 	pflag.StringP("database", "d", "", "DatabaseUrl")
 	pflag.StringP("migrate", "m", "", "Run migrations up/down or don't run if empty")
+	pflag.StringP("redis", "r", "", "RedisHostUrl for cache")
+	pflag.BoolP("cache-enabled", "c", false, "Enable page caching")
 	pflag.Parse()
 
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
