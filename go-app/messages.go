@@ -62,7 +62,7 @@ func initMessagesEndpoints(router *gin.Engine) {
 	}
 
 	router.PUT("/messages/:id", func(c *gin.Context) {
-		authUserId, err := strconv.Atoi(c.GetHeader("x	"))
+		authUserId, err := strconv.Atoi(c.GetHeader("X-User-Id"))
 		if err != nil || authUserId == 0 {
 			c.JSON(http.StatusUnprocessableEntity, err)
 			return
@@ -159,6 +159,7 @@ func readMessagesFunc() func(c *gin.Context) {
 		var err error
 		limit := 10
 		offset := 0
+		search := ""
 
 		if len(c.Query("limit")) > 0 {
 			limit, err = strconv.Atoi(c.Query("limit"))
@@ -174,8 +175,11 @@ func readMessagesFunc() func(c *gin.Context) {
 				return
 			}
 		}
+		if len(c.Query("search")) > 0 {
+			search = c.Query("search")
+		}
 
-		messages, err := getMessages(limit, offset)
+		messages, err := getMessages(limit, offset, search)
 		if err != nil {
 			errResponse(c, err)
 			return
@@ -218,14 +222,19 @@ func getLastMessagesUpdatedAt() (mysql.NullTime, error) {
 	return updated, nil
 }
 
-func getMessages(limit, offset int) (*Messages, error) {
+func getMessages(limit, offset int, search string) (*Messages, error) {
 	db, err := dbConn()
 	defer db.Close()
 	if err != nil {
 		return nil, err
 	}
 
-	selDB, err := db.Query("SELECT id, subject, body, user_id, user_name, created_at, updated_at FROM messages ORDER BY id DESC LIMIT ? OFFSET ?", limit, offset)
+	var selDB *sql.Rows
+	if len(search) > 0 {
+		selDB, err = db.Query("SELECT id, subject, body, user_id, user_name, created_at, updated_at FROM messages WHERE body like ? ORDER BY created_at DESC LIMIT ? OFFSET ?", "%" + search + "%", limit, offset)
+	} else {
+		selDB, err = db.Query("SELECT id, subject, body, user_id, user_name, created_at, updated_at FROM messages ORDER BY created_at DESC LIMIT ? OFFSET ?", limit, offset)
+	}
 	if err != nil {
 		return nil, err
 	}
