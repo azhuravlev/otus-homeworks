@@ -53,7 +53,7 @@ func initMessagesEndpoints(router *gin.Engine) {
 		c.JSON(http.StatusOK, stat)
 	})
 
-	if viper.GetBool("cache-enabled") {
+	if viper.GetBool("cache") {
 		router.GET("/messages", cachePageIfValid(cacheStore, 10 * time.Minute, messagesUnchanged, readMessagesFunc()))
 		router.GET("/messages/:id", cache.CachePage(cacheStore, 10 * time.Minute, readMessageFunc()))
 	} else {

@@ -88,7 +88,7 @@ func (w *cachedWriter) WriteString(data string) (n int, err error) {
 }
 
 func initCache() {
-	if viper.GetBool("cache-enabled") {
+	if viper.GetBool("cache") {
 		cacheStore = persistence.NewRedisCache(viper.GetString("redis"), "", CacheLifeATime)
 	}
 }
