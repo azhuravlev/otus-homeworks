@@ -1,0 +1,1 @@
+locust -f locustfile.py --headless -u 1000 -r 1000 --run-time 25m --host http://arch.homework/otusapp

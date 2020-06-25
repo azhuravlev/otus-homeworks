@@ -4,6 +4,8 @@ metadata:
   name: {{ include "az-app.fullname" . }}
 data:
   MARIADB_PATH: {{ printf "%s:%s" .Values.mariadb.label .Values.mariadb.service.port }}
+  REDIS_PATH: {{ printf "%s:%s" .Values.redis.path .Values.redis.port }}
+  CACHE_ENABLED: {{ .Values.cacheEnabled | quote }}
 ---
 apiVersion: v1
 kind: Secret

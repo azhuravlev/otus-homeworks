@@ -59,6 +59,16 @@ spec:
                 secretKeyRef:
                   key: DATABASE_URI
                   name: {{ include "az-app.fullname" . }}
+            - name: AZ_OTUS_CACHE
+              valueFrom:
+                configMapKeyRef:
+                  key: CACHE_ENABLED
+                  name: {{ include "az-app.fullname" . }}
+            - name: AZ_OTUS_REDIS
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_PATH
+                  name: {{ include "az-app.fullname" . }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

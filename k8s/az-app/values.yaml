@@ -3,11 +3,12 @@ replicaCount: 2
 image:
   repository: agzhur/az-otus-homework-go-app
   pullPolicy: Always
-  tag: "1.8"
+  tag: "1.11"
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+cacheEnabled: true
 
 serviceAccount:
   create: false
@@ -17,7 +18,7 @@ service:
   port: 8000
 
 ingress:
-  enabled: false
+  enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /$2
@@ -33,8 +34,8 @@ metrics:
 
 resources:
   limits:
-    cpu: 100m
-    memory: 128Mi
+    cpu: 500m
+    memory: 512Mi
   # requests:
   #   cpu: 100m
   #   memory: 128Mi
@@ -51,6 +52,10 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+redis:
+  path: "redis-master"
+  port: "6379"
 
 mariadb:
   label: mariadb
