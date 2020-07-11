@@ -54,8 +54,8 @@ func initMessagesEndpoints(router *gin.Engine) {
 	})
 
 	if viper.GetBool("cache") {
-		router.GET("/messages", cachePageIfValid(cacheStore, 10 * time.Minute, messagesUnchanged, readMessagesFunc()))
-		router.GET("/messages/:id", cache.CachePage(cacheStore, 10 * time.Minute, readMessageFunc()))
+		router.GET("/messages", cachePageIfValid(cacheStore, 10*time.Minute, messagesUnchanged, readMessagesFunc()))
+		router.GET("/messages/:id", cache.CachePage(cacheStore, 10*time.Minute, readMessageFunc()))
 	} else {
 		router.GET("/messages", readMessagesFunc())
 		router.GET("/messages/:id", readMessageFunc())
@@ -231,7 +231,7 @@ func getMessages(limit, offset int, search string) (*Messages, error) {
 
 	var selDB *sql.Rows
 	if len(search) > 0 {
-		selDB, err = db.Query("SELECT id, subject, body, user_id, user_name, created_at, updated_at FROM messages WHERE body like ? ORDER BY created_at DESC LIMIT ? OFFSET ?", "%" + search + "%", limit, offset)
+		selDB, err = db.Query("SELECT id, subject, body, user_id, user_name, created_at, updated_at FROM messages WHERE body like ? ORDER BY created_at DESC LIMIT ? OFFSET ?", "%"+search+"%", limit, offset)
 	} else {
 		selDB, err = db.Query("SELECT id, subject, body, user_id, user_name, created_at, updated_at FROM messages ORDER BY created_at DESC LIMIT ? OFFSET ?", limit, offset)
 	}

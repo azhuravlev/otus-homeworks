@@ -50,6 +50,8 @@ func main() {
 
 	initMessagesEndpoints(router)
 	initUsersEndpoints(router)
+	initProductsEndpoints(router)
+	initOrdersEndpoints(router)
 
 	router.Run(serverPort)
 }
