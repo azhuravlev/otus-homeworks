@@ -483,7 +483,7 @@ slave:
     annotations: {}
 
 metrics:
-  enabled: true
+  enabled: false
   image:
     registry: docker.io
     repository: bitnami/mysqld-exporter
