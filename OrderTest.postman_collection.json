@@ -1,0 +1,299 @@
+{
+	"info": {
+		"_postman_id": "9496237b-aa68-40a5-a924-19f412b7a1e1",
+		"name": "AZOtusGo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Order test",
+			"item": [
+				{
+					"name": "Создаём продукт",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c00226c4-3330-4420-83b1-88d6da84af7a",
+								"exec": [
+									"var affectedStat = JSON.parse(responseBody);",
+									"pm.collectionVariables.set(\"productId\", affectedStat[\"last_insert_id\"])"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "febf004e-5635-489d-a21d-3ef82279dde7",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"host": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Host",
+								"type": "text",
+								"value": "{{hostname}}"
+							},
+							{
+								"key": "X-User-Admin",
+								"value": "y",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"{{$randomProduct}}\",\n\t\"price\": {{$randomInt}},\n\t\"available\": {{$randomInt}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Читаем список заказов",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ea26d941-961d-4f91-898b-759fd09d9c1a",
+								"exec": [
+									"var affectedStat = JSON.parse(responseBody);",
+									"pm.collectionVariables.set(\"ETag\", pm.response.headers.get(\"Etag\"))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"host": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Host",
+								"value": "{{hostname}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "123",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Создаём заказ",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "76a7f6f2-abff-4d16-833d-b50851d5a966",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"host": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Host",
+								"type": "text",
+								"value": "{{hostname}}"
+							},
+							{
+								"key": "X-User-Id",
+								"type": "text",
+								"value": "123"
+							},
+							{
+								"key": "If-Match",
+								"type": "text",
+								"value": "{{ETag}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"product_id\": {{productId}},\n\t\"count\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Пытаемся создать заказ с тем же Etag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e3ff63cb-a1e2-4bed-a4ed-4ddd1eed0026",
+								"exec": [
+									"pm.test(\"Status code is 409\", function () {",
+									"    pm.response.to.have.status(409);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"host": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Host",
+								"type": "text",
+								"value": "{{hostname}}"
+							},
+							{
+								"key": "X-User-Id",
+								"type": "text",
+								"value": "123"
+							},
+							{
+								"key": "If-Match",
+								"type": "text",
+								"value": "{{ETag}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"product_id\": {{productId}},\n\t\"count\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "da6c7c53-65f2-4fd6-8e7f-fac960000e93",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "d80e8f40-8d22-439a-8757-bc1be29ac852",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "7dad51ce-9d54-40b8-a4ec-8fbbcbd3be66",
+			"key": "baseUrl",
+			"value": "http://arch.homework/otusapp"
+		},
+		{
+			"id": "20016562-2884-4c7d-a31c-27b865667a97",
+			"key": "hostname",
+			"value": "arch.homework"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
