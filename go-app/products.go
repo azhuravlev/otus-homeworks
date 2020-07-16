@@ -17,6 +17,7 @@ type Product struct {
 	Name      string    `json:"name"`
 	Price     int       `json:"price"`
 	Available int       `json:"available"`
+	Reserved  int       `json:"reserved"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -54,17 +55,10 @@ func initProductsEndpoints(router *gin.Engine) {
 		}
 
 		product, err := getProductById(c.Param("id"))
-		if err != nil {
-			if err == sql.ErrNoRows {
-				c.JSON(http.StatusNotFound, gin.H{})
-			} else {
-				errResponse(c, err)
-			}
-			return
-		}
-		if err := c.ShouldBind(product); err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{})
+		} else {
 			errResponse(c, err)
-			return
 		}
 
 		stat, err := updateProductById(c.Param("id"), product)
@@ -73,6 +67,84 @@ func initProductsEndpoints(router *gin.Engine) {
 			return
 		}
 		c.JSON(http.StatusOK, stat)
+	})
+	router.PUT("/products/:id/reserve", func(c *gin.Context) {
+		admin := c.GetHeader("X-User-Admin")
+		if admin == "" {
+			c.JSON(http.StatusUnprocessableEntity, "Not allowed")
+			return
+		}
+
+		product, err := getProductById(c.Param("id"))
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{})
+		} else {
+			errResponse(c, err)
+		}
+
+		count, err := strconv.Atoi(c.Param("count"))
+		if err != nil {
+			errResponse(c, err)
+			return
+		}
+		err = product.Reserve(count)
+		if err != nil {
+			errResponse(c, err)
+			return
+		}
+		c.JSON(http.StatusOK, "Reserved")
+	})
+	router.PUT("/products/:id/unreserve", func(c *gin.Context) {
+		admin := c.GetHeader("X-User-Admin")
+		if admin == "" {
+			c.JSON(http.StatusUnprocessableEntity, "Not allowed")
+			return
+		}
+
+		product, err := getProductById(c.Param("id"))
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{})
+		} else {
+			errResponse(c, err)
+		}
+
+		count, err := strconv.Atoi(c.Param("count"))
+		if err != nil {
+			errResponse(c, err)
+			return
+		}
+		err = product.ReturnFromReserve(count)
+		if err != nil {
+			errResponse(c, err)
+			return
+		}
+		c.JSON(http.StatusOK, "Unreserved")
+	})
+	router.PUT("/products/:id/sell", func(c *gin.Context) {
+		admin := c.GetHeader("X-User-Admin")
+		if admin == "" {
+			c.JSON(http.StatusUnprocessableEntity, "Not allowed")
+			return
+		}
+
+		product, err := getProductById(c.Param("id"))
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{})
+		} else {
+			errResponse(c, err)
+		}
+
+		count, err := strconv.Atoi(c.Param("count"))
+		if err != nil {
+			errResponse(c, err)
+			return
+		}
+		err = product.Sell(count)
+		if err != nil {
+			errResponse(c, err)
+			return
+		}
+		c.JSON(http.StatusOK, "Sold")
 	})
 }
 
@@ -131,7 +203,7 @@ func getProducts() (*Products, error) {
 	}
 
 	var selDB *sql.Rows
-	selDB, err = db.Query("SELECT id, name, price, available, created_at, updated_at FROM products order BY created_at DESC")
+	selDB, err = db.Query("SELECT id, name, price, available, reserved, created_at, updated_at FROM products order BY created_at DESC")
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +226,7 @@ func getProductById(id string) (*Product, error) {
 	if err != nil {
 		return nil, err
 	}
-	dbRow := db.QueryRow("SELECT id, name, price, available, created_at, updated_at FROM products WHERE id = ?", id)
+	dbRow := db.QueryRow("SELECT id, name, price, available, reserved, created_at, updated_at FROM products WHERE id = ?", id)
 	product := &Product{}
 	err = fetchDBProduct(product, dbRow)
 	if err != nil {
@@ -168,9 +240,9 @@ func fetchDBProduct(product *Product, row interface{}) error {
 	var err error
 	switch rowValue := row.(type) {
 	case *sql.Rows:
-		err = rowValue.Scan(&product.Id, &product.Name, &product.Price, &product.Available, &created, &updated)
+		err = rowValue.Scan(&product.Id, &product.Name, &product.Price, &product.Available, &product.Reserved, &created, &updated)
 	case *sql.Row:
-		err = rowValue.Scan(&product.Id, &product.Name, &product.Price, &product.Available, &created, &updated)
+		err = rowValue.Scan(&product.Id, &product.Name, &product.Price, &product.Available, &product.Reserved, &created, &updated)
 	default:
 		return fmt.Errorf("unknow type for raw: %v", row)
 	}
@@ -227,11 +299,11 @@ func updateProductById(id string, newData *Product) (ExecStats, error) {
 	if err != nil {
 		return res, err
 	}
-	updateStatement, err := db.Prepare("UPDATE products SET name=?,price=?,available=? WHERE id=?")
+	updateStatement, err := db.Prepare("UPDATE products SET name=?,price=?,available=?,reserved=? WHERE id=?")
 	if err != nil {
 		return res, err
 	}
-	created, err := updateStatement.Exec(newData.Name, newData.Price, newData.Available, id)
+	created, err := updateStatement.Exec(newData.Name, newData.Price, newData.Available, newData.Reserved, id)
 	if err != nil {
 		return res, err
 	}
@@ -241,4 +313,31 @@ func updateProductById(id string, newData *Product) (ExecStats, error) {
 	}
 	res.Affected = affected
 	return res, nil
+}
+
+func (product *Product) Reserve(count int) error {
+	product.Reserved = product.Reserved + count
+	if product.Reserved > product.Available {
+		return fmt.Errorf("Not enough products available only: %d", product.Available)
+	}
+
+	_, err := updateProductById(strconv.Itoa(product.Id), product)
+	return err
+}
+
+func (product *Product) ReturnFromReserve(count int) error {
+	product.Reserved = product.Reserved - count
+	_, err := updateProductById(strconv.Itoa(product.Id), product)
+	return err
+}
+
+func (product *Product) Sell(count int) error {
+	if product.Reserved > product.Available {
+		return fmt.Errorf("Not enough products available only: %d", product.Available)
+	}
+	product.Reserved = product.Reserved - count
+	product.Available = product.Available - count
+
+	_, err := updateProductById(strconv.Itoa(product.Id), product)
+	return err
 }

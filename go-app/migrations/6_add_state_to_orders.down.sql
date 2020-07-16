@@ -1,0 +1,1 @@
+ALTER TABLE `orders` DROp COLUMN state;

@@ -15,6 +15,7 @@ type Orders []Order
 
 type Order struct {
 	Id        int       `json:"id"`
+	State     string    `json:state`
 	ProductId int       `json:"product_id"`
 	Product   *Product  `json:"product"`
 	Count     int       `json:"count"`
@@ -25,39 +26,7 @@ type Order struct {
 }
 
 func initOrdersEndpoints(router *gin.Engine) {
-	router.POST("/orders", func(c *gin.Context) {
-		authUserId, err := strconv.Atoi(c.GetHeader("X-User-Id"))
-		if err != nil || authUserId == 0 {
-			c.JSON(http.StatusUnprocessableEntity, err)
-			return
-		}
-
-		etag := strconv.Itoa(getLastOrderId(authUserId))
-
-		if match := c.GetHeader("If-Match"); match != "" {
-			if !strings.Contains(match, etag) {
-				c.JSON(http.StatusConflict, "Orders was changed")
-				return
-			}
-		}
-
-		order := Order{}
-
-		if err := c.ShouldBind(&order); err != nil {
-			errResponse(c, err)
-			return
-		}
-
-		order.UserId = authUserId
-
-		stat, err := createOrder(&order)
-		if err != nil {
-			errResponse(c, err)
-			return
-		}
-
-		c.JSON(http.StatusOK, stat)
-	})
+	router.POST("/orders", createOrderFunc())
 	router.GET("/orders", readOrdersFunc())
 	router.GET("/orders/:id", readOrderFunc())
 	router.DELETE("/orders/:id", func(c *gin.Context) {
@@ -89,6 +58,64 @@ func initOrdersEndpoints(router *gin.Engine) {
 		}
 		c.JSON(http.StatusOK, stat)
 	})
+	router.PUT("/orders/:id/state", func(c *gin.Context) {
+		authUserId, err := strconv.Atoi(c.GetHeader("X-User-Id"))
+		if err != nil || authUserId == 0 {
+			c.JSON(http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		order, err := getOrderById(c.Param("id"), authUserId)
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{})
+		} else {
+			errResponse(c, err)
+		}
+
+		err = order.SetState(c.Param("state"))
+		if err != nil {
+			errResponse(c, err)
+			return
+		}
+		c.JSON(http.StatusOK, "State changed")
+	})
+}
+
+func createOrderFunc() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		authUserId, err := strconv.Atoi(c.GetHeader("X-User-Id"))
+		if err != nil || authUserId == 0 {
+			c.JSON(http.StatusUnauthorized, err)
+			return
+		}
+
+		etag := strconv.Itoa(getLastOrderId(authUserId))
+
+		if match := c.GetHeader("If-Match"); match != "" {
+			if !strings.Contains(match, etag) {
+				c.JSON(http.StatusConflict, "Orders was changed")
+				return
+			}
+		}
+
+		order := Order{}
+
+		if err := c.ShouldBind(&order); err != nil {
+			errResponse(c, err)
+			return
+		}
+
+		order.UserId = authUserId
+		order.State = "pending"
+
+		stat, err := createOrder(&order)
+		if err != nil {
+			errResponse(c, err)
+			return
+		}
+
+		c.JSON(http.StatusOK, stat)
+	}
 }
 
 func readOrdersFunc() func(c *gin.Context) {
@@ -157,7 +184,7 @@ func getOrders(user_id int) (*Orders, error) {
 	}
 
 	var selDB *sql.Rows
-	selDB, err = db.Query("SELECT id, product_id, count, user_id, created_at, updated_at FROM orders WHERE user_id = ? ORDER BY created_at DESC", user_id)
+	selDB, err = db.Query("SELECT id, state, product_id, count, user_id, created_at, updated_at FROM orders WHERE user_id = ? ORDER BY created_at DESC", user_id)
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +207,7 @@ func getOrderById(id string, user_id int) (*Order, error) {
 	if err != nil {
 		return nil, err
 	}
-	dbRow := db.QueryRow("SELECT id, product_id, count, user_id, created_at, updated_at FROM orders WHERE id = ? AND user_id = ?", id, user_id)
+	dbRow := db.QueryRow("SELECT id, state, product_id, count, user_id, created_at, updated_at FROM orders WHERE id = ? AND user_id = ?", id, user_id)
 	order := &Order{}
 	err = fetchDBOrder(order, dbRow)
 	if err != nil {
@@ -197,11 +224,11 @@ func createOrder(newData *Order) (ExecStats, error) {
 	if err != nil {
 		return res, err
 	}
-	createStatement, err := db.Prepare("INSERT INTO orders(product_id, count, user_id) VALUES(?,?,?)")
+	createStatement, err := db.Prepare("INSERT INTO orders(state, product_id, count, user_id) VALUES(?,?,?)")
 	if err != nil {
 		return res, err
 	}
-	created, err := createStatement.Exec(newData.ProductId, newData.Count, newData.UserId)
+	created, err := createStatement.Exec(newData.State, newData.ProductId, newData.Count, newData.UserId)
 	if err != nil {
 		return res, err
 	}
@@ -248,9 +275,9 @@ func fetchDBOrder(order *Order, row interface{}) error {
 	var err error
 	switch rowValue := row.(type) {
 	case *sql.Rows:
-		err = rowValue.Scan(&order.Id, &order.ProductId, &order.Count, &order.UserId, &created, &updated)
+		err = rowValue.Scan(&order.Id, &order.State, &order.ProductId, &order.Count, &order.UserId, &created, &updated)
 	case *sql.Row:
-		err = rowValue.Scan(&order.Id, &order.ProductId, &order.Count, &order.UserId, &created, &updated)
+		err = rowValue.Scan(&order.Id, &order.State, &order.ProductId, &order.Count, &order.UserId, &created, &updated)
 	default:
 		return fmt.Errorf("unknow type for raw: %v", row)
 	}
@@ -276,4 +303,34 @@ func fetchDBOrder(order *Order, row interface{}) error {
 		order.Total = order.Count * product.Price
 	}
 	return nil
+}
+
+func updateOrderById(id string, newData *Order) (ExecStats, error) {
+	res := ExecStats{}
+
+	db, err := dbConn()
+	defer db.Close()
+	if err != nil {
+		return res, err
+	}
+	updateStatement, err := db.Prepare("UPDATE orders SET state=? WHERE id=?")
+	if err != nil {
+		return res, err
+	}
+	created, err := updateStatement.Exec(newData.State, id)
+	if err != nil {
+		return res, err
+	}
+	affected, err := created.RowsAffected()
+	if err != nil {
+		return res, err
+	}
+	res.Affected = affected
+	return res, nil
+}
+
+func (order *Order) SetState(state string) error {
+	order.State = state
+	_, err := updateOrderById(strconv.Itoa(order.Id), order)
+	return err
 }
